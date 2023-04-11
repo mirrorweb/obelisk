@@ -1,6 +1,7 @@
 package obelisk
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -578,7 +579,13 @@ func (arc *Archiver) processLinkNode(ctx context.Context, node *html.Node, baseU
 		// Convert <link> into <style>
 		node.Data = "style"
 		dom.SetAttribute(node, "type", "text/css")
-		dom.SetTextContent(node, b2s(content))
+
+		// Process CSS from stylesheet.
+		processedCSS, err := arc.processCSS(ctx, bytes.NewReader(content), baseURL)
+		if err != nil {
+			return err
+		}
+		dom.SetTextContent(node, b2s([]byte(processedCSS)))
 	}
 	return nil
 }
