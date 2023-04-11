@@ -149,6 +149,16 @@ func (arc *Archiver) Archive(ctx context.Context, req Request) ([]byte, string, 
 	return s2b(result), contentType, nil
 }
 
+// ArchiveEmail performs the archiving process on email HTML.
+// All URLs contained in the HTML are presumed to be absolute.
+func (arc *Archiver) ArchiveEmail(ctx context.Context, input io.Reader) ([]byte, error) {
+	res, err := arc.processHTML(ctx, input, &nurl.URL{}, false)
+	if err != nil {
+		return nil, err
+	}
+	return s2b(res), nil
+}
+
 // WithCookies attach request cookies to `Archiver`.
 func (arc *Archiver) WithCookies(cookies []*http.Cookie) *Archiver {
 	arc.cookies = cookies
